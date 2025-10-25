@@ -1,0 +1,23 @@
+[project]
+name = "historyserver"
+version = "0.1.0"
+description = "Serveur d'enregistrement des stats des users"
+authors = [{ name = "Hugo Beets", email = "hugo.beets2003@sfr.fr" }]
+readme = "README.md"
+requires-python = ">=3.11"
+
+# Tes dépendances de base
+dependencies = [
+    "aiohttp",
+    "python-dotenv",
+    "asyncpg",
+    "aiohttp_cors",
+    "pytest-cov",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
