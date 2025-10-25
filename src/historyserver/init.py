@@ -8,7 +8,10 @@ from aiohttp.web import Request
 from modules.logger.logger import Logger
 from os import getenv
 from dotenv import load_dotenv
-load_dotenv("common/.env")
+from pathlib import Path
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
+load_dotenv(ROOT_DIR / ".env")
 
 log = Logger("log.log")
 print = log.info

@@ -1,8 +1,8 @@
+from .init import app, routes, log, port
 import asyncio
 import logging
 from aiohttp import web
 from .crawlers.stats import gather_stats
-from .init import app, routes, log, port
 from .cors import cors
 print = log.info
 
