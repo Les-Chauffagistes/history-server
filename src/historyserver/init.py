@@ -5,10 +5,11 @@ from aiohttp.web_request import Request
 from aiohttp.web import StreamResponse, json_response
 from typing import Awaitable, Callable, Literal, cast
 from aiohttp.web import Request
-from modules.logger.logger import Logger
+from .modules.logger.logger import Logger
 from os import getenv
 from dotenv import load_dotenv
 from pathlib import Path
+
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
 load_dotenv(ROOT_DIR / ".env")
