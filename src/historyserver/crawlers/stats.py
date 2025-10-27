@@ -12,7 +12,7 @@ async def gather_stats() -> NoReturn:
             payload = await get_every_user_data()
             for user_id, pool_data in payload["users"].items():
                 try:
-                    await archive_stats(user_id, pool_data)
+                    await archive_stats(user_id, pool_data, payload["repartition"])
 
                 except Exception:
                     log.error("Error while archiving stats for user", user_id)
