@@ -5,10 +5,10 @@ from historyserver.init import log
 
 async def archive_stats(user_id: str, user: User):
     connection = await Postgre.get_connection("chauffagistes")
-    log.debug(user)
+    log.debug(user_id, user)
     records = [
         (
-            record["workername"],
+            (record["workername"].split(".") + ["worker sans nom"])[1] if "." in record["workername"] else "worker sans nom",
             from_string_to_number(record["hashrate1m"]),
             from_string_to_number(record["hashrate5m"]),
             from_string_to_number(record["hashrate1hr"]),
