@@ -2,7 +2,6 @@ from historyserver.models.Repartition import Repartition
 from .database.postgre import Postgre
 from ..models.User import User
 from ..functions.converter import from_string_to_number
-from historyserver.init import log
 
 async def archive_stats(user_id: str, user: User, repartition: dict[str, Repartition]):
     connection = await Postgre.get_connection("chauffagistes")
