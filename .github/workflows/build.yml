@@ -33,10 +33,10 @@ jobs:
 
     - name: Push Docker image
       run: |
-        docker push ghcr.io/${{ github.repository_owner }}/history-server:${{ github.sha }}
+        docker push ghcr.io/les-chauffagistes/history-server:${{ github.sha }}
 
     - name: tag latest
       if: github.ref == 'refs/heads/main'
       run: |
-        docker tag ghcr.io/${{ github.repository_owner }}/history-server:${{ github.sha }} ghcr.io/${{ github.repository_owner }}/history-server:latest
-        docker push ghcr.io/${{ github.repository_owner }}/history-server:latest
+        docker tag ghcr.io/les-chauffagistes/history-server:${{ github.sha }} ghcr.io/les-chauffagistes/history-server:latest
+        docker push ghcr.io/les-chauffagistes/history-server:latest
