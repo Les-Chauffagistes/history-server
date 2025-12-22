@@ -8,11 +8,14 @@ class Postgre:
     @classmethod
     async def get_connection(cls, databse: str) -> asyncpg.Connection:
         _password = os.getenv("POSTGRE_PASSWORD")
+        _host = os.getenv("POSTGRE_HOST")
+        _port = os.getenv("POSTGRE_PORT")
+        _user = os.getenv("POSTGRE_USER")
         assert _password is not None
         return await asyncpg.connect(
-            host="192.168.1.201",
-            port=5432,
-            user="postgres",
+            host=_host,
+            port=_port,
+            user=_user,
             password=_password,
             database=databse,
         )

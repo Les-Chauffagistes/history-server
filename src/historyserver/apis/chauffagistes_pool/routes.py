@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from ...models.APIData import APIPayload
 from .base import send_request
 
