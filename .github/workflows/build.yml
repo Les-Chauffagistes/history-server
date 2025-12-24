@@ -30,7 +30,7 @@ jobs:
     - name: Build & push image
       id: build
       run: |
-        IMAGE=ghcr.io/les-chauffagistes/heatboard
+        IMAGE=ghcr.io/les-chauffagistes/history-server
         TAG=${GITHUB_SHA}
 
         docker build -t $IMAGE:$TAG .
@@ -44,7 +44,7 @@ jobs:
       run: |
         curl -s \
           -H "Authorization: token ${{ secrets.DEPLOY_REPO_TOKEN }}" \
-          https://raw.githubusercontent.com/Les-Chauffagistes/heatboard-deploy/develop/services/heatboard.digest \
+          https://raw.githubusercontent.com/Les-Chauffagistes/heatboard-deploy/develop/services/history-server.digest \
           > current.digest || echo "" > current.digest
 
         echo "digest=$(cat current.digest)" >> $GITHUB_OUTPUT
