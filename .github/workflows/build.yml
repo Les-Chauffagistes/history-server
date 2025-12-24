@@ -27,13 +27,36 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build Docker image
+    - name: Build & push image
+      id: build
       run: |
-        docker build -t ghcr.io/les-chauffagistes/history-server:${{ github.sha }} .
+        IMAGE=ghcr.io/les-chauffagistes/heatboard
+        TAG=${GITHUB_SHA}
 
-    - name: Push Docker image
+        docker build -t $IMAGE:$TAG .
+        docker push $IMAGE:$TAG
+
+        DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE:$TAG | cut -d@ -f2)
+        echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+    
+    - name: Get current deployed digest
+      id: current
       run: |
-        docker push ghcr.io/les-chauffagistes/history-server:${{ github.sha }}
+        curl -s \
+          -H "Authorization: token ${{ secrets.DEPLOY_REPO_TOKEN }}" \
+          https://raw.githubusercontent.com/Les-Chauffagistes/heatboard-deploy/develop/services/heatboard.digest \
+          > current.digest || echo "" > current.digest
+
+        echo "digest=$(cat current.digest)" >> $GITHUB_OUTPUT
+    
+    - name: Check digest change
+      id: compare
+      run: |
+        if [ "${{ steps.build.outputs.digest }}" = "${{ steps.current.outputs.digest }}" ]; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
 
     - name: tag latest
       if: github.ref == 'refs/heads/main'
@@ -42,6 +65,7 @@ jobs:
         docker push ghcr.io/les-chauffagistes/history-server:latest
     
     - name: Notify orchestration repo
+      if: steps.compare.outputs.changed == 'true'
       run: |
         curl -X POST \
           -H "Authorization: token ${{ secrets.DEPLOY_REPO_TOKEN }}" \
@@ -52,6 +76,7 @@ jobs:
             "client_payload": {
               "service": "history-server",
               "image": "ghcr.io/les-chauffagistes/history-server",
-              "tag": "'${GITHUB_SHA}'"
+              "tag": "'${GITHUB_SHA}'",
+              "digest": "${{ steps.build.outputs.digest }}"
             }
           }'
