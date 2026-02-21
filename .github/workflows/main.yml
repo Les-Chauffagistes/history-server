@@ -55,5 +55,5 @@ jobs:
       - name: notify-deploy
         run: |
           curl -X POST ${{ secrets.DEPLOY_URL }} \
-            -H "X-Deploy-Token: ${{ secrets.DEPLOY_SECRET }}" \
+            -H "X-Deploy-Token: ${{ secrets.GLOBAL_DEPLOY_TOKEN }}" \
             -d '{"repository": {"full_name": "Les-Chauffagistes/history-server"}}'
