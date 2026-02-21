@@ -14,8 +14,8 @@ jobs:
         run: |
           TS=$(date -u +"%Y%m%dT%H%M%SZ")
           mkdir -p artifact
-          tar -C . -czf artifact/stats.chauffagistes-${TS}.tar.gz \
-            .next package.json package-lock.json public generated prisma
+          tar -C . -czf artifact/history.chauffagistes-${TS}.tar.gz \
+            src test requirements.txt main.py init.py
           echo "TS=$TS" >> $GITHUB_ENV
 
       - name: Push git tag
