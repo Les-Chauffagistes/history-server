@@ -1,0 +1,59 @@
+name: build-and-release
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: [self-hosted, macOS]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pack
+        run: |
+          TS=$(date -u +"%Y%m%dT%H%M%SZ")
+          mkdir -p artifact
+          tar -C . -czf artifact/stats.chauffagistes-${TS}.tar.gz \
+            .next package.json package-lock.json public generated prisma
+          echo "TS=$TS" >> $GITHUB_ENV
+
+      - name: Push git tag
+        env:
+          GITHUB_PAT: ${{ secrets.GLOBAL_DEPLOY_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+          # Setup credential helper pour utiliser le token
+          git remote set-url origin https://github.com/Les-Chauffagistes/history-server.git
+          git config credential.helper '!f() { echo "username=x-access-token"; echo "password=$GITHUB_PAT"; }; f'
+      
+          git tag v$TS
+          git push origin v$TS
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ env.TS }}"
+          release_name: "Release ${{ env.TS }}"
+          body: "Automated release ${{ env.TS }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GLOBAL_DEPLOY_TOKEN }}
+
+      - name: Upload artifact to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifact/stats.chauffagistes-${{ env.TS }}.tar.gz
+          tag_name: v${{ env.TS }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GLOBAL_DEPLOY_TOKEN }}
+
+      - name: notify-deploy
+        run: |
+          curl -X POST ${{ secrets.DEPLOY_URL }} \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_SECRET }}" \
+            -d '{"repository": {"full_name": "Les-Chauffagistes/history-server"}}'

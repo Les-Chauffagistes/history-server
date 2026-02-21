@@ -1,4 +1,4 @@
-from ...models.APIData import APIPayload
+from .models.APIData import APIPayload
 from .base import send_request
 
 

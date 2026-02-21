@@ -1,15 +1,14 @@
-FROM python:3.13
+FROM python:3.13-alpine
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./src ./src
-COPY ./tests ./tests
+COPY . .
 
 ENV PYTHONPATH=/app/src
 
-RUN pytest tests -vv --maxfail=1
+RUN python -m pytest tests -vv --maxfail=1
 
-CMD ["python", "-m", "historyserver"]
+CMD ["python", "main.py"]
