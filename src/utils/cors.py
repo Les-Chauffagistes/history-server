@@ -9,6 +9,11 @@ cors = aiohttp_cors.setup(
             expose_headers="*",
             allow_headers="*"
         ),
+        "https://heatboard.chauffagistes-btc.fr": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*"
+        ),
         "https://chauffagistes.swakraft.fr": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
