@@ -2,7 +2,7 @@ import asyncio
 
 from utils.cors import cors
 import init as hs_init
-from init import routes, PORT, app, log
+from init import MODE, routes, PORT, app, log
 from aiohttp import web
 from crawlers.stats import gather_stats
 import core
@@ -16,7 +16,8 @@ async def main():
         site = web.TCPSite(runner, '0.0.0.0', PORT)
         await site.start()
     hs_init.log.info(f'Serveur interne en ligne sur localhost:{PORT}')
-    #await gather_stats()
+    if MODE == "PROD":
+        await gather_stats()
     while True:
         await asyncio.sleep(1)
 

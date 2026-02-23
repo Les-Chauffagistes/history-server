@@ -19,7 +19,7 @@ class PoolProvider:
 POOL = PoolProvider(None)
 
 
-async def create_db_pool(_app: Application):
+async def create_db_pool(app: Application):
     """Créer le pool de connexions au démarrage"""
     # importer paresseusement le logger central pour éviter les importations circulaires
     import init as hs_init
@@ -39,6 +39,7 @@ async def create_db_pool(_app: Application):
         setup=setup_connection,
     )
     POOL.set(pool)
+    app["db_pool"] = pool
 
 
 async def setup_connection(conn: Connection):
