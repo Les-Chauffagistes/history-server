@@ -11,11 +11,6 @@ class WorkerHistory(TypedDict):
     avg_hashrate7d: int
     avg_weight: float
 
-class DailyPoolHistory(TypedDict):
-    bucket: datetime
-    avg_hashrate1h: int
-    avg_weight: float
-
 class PoolHistory(TypedDict):
     timestamp: datetime
     avg_hashrate1h: int

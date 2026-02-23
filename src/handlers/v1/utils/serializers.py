@@ -1,5 +1,5 @@
 from typing import Generator
-from core.models import DailyPoolHistory, PoolHistory, WorkerHistory, WorkersWeight
+from core.models import PoolHistory, WorkerHistory, WorkersWeight
 
 
 def serialize_worker_stats(data: Generator[dict]) -> Generator[WorkerHistory]:
@@ -11,14 +11,6 @@ def serialize_worker_stats(data: Generator[dict]) -> Generator[WorkerHistory]:
             "avg_hashrate1h": row["avg_hashrate1h"],
             "avg_hashrate1d": row["avg_hashrate1d"],
             "avg_hashrate7d": row["avg_hashrate7d"],
-            "avg_weight": row["avg_weight"],
-        }
-
-def serialyze_daily_pool_stats(data: Generator[dict]) -> Generator[DailyPoolHistory]:
-    for row in data:
-        yield {
-            "bucket": row["bucket"],
-            "avg_hashrate1h": row["avg_hashrate1h"],
             "avg_weight": row["avg_weight"],
         }
 

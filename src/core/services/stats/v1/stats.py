@@ -1,5 +1,5 @@
 from utils.formatter import format_rows
-from handlers.v1.utils.parsers import DailyPoolStatsParamsV1, PoolStatsParamsV1, WorkerStatsParamsV1
+from handlers.v1.utils.parsers import PoolStatsParamsV1, WorkerStatsParamsV1
 from database.postgre import POOL
 
 VALID_TABLES = {"forever": "worker_stats_raw", "daily": "worker_stats_1d"}
@@ -41,30 +41,6 @@ async def get_worker_stats(payload: WorkerStatsParamsV1):
 
     return format_rows(stats)
 
-
-async def get_daily_pool_stats(payload: DailyPoolStatsParamsV1):
-    address = payload.address
-
-    if address == None:
-        raise ValueError("Missing parameters")
-
-    stats = await POOL.get().fetch(
-        f"""   
-            SELECT
-                worker_id,
-                time_bucket('6 hours', "timestamp") AS bucket,
-                ROUND(AVG(avg_hashrate1h)::numeric, 0) AS avg_hashrate1h,
-                ROUND(AVG(avg_weight)::numeric, 3) AS avg_weight
-            FROM worker_stats_raw
-            WHERE "user" = $1
-            GROUP BY "user", worker_id, bucket
-            ORDER BY "user", worker_id, bucket DESC;
-        """.strip(),
-        address,
-    )
-
-    return format_rows(stats)
-
 async def get_pool_stats(payload: PoolStatsParamsV1):
     address = payload.address
 
@@ -72,7 +48,7 @@ async def get_pool_stats(payload: PoolStatsParamsV1):
         raise ValueError("Missing parameters")
 
     stats = await POOL.get().fetch(
-        f"""
+        """
             SELECT SUM(avg_hashrate1h) "avg_hashrate1h", SUM(avg_hashrate1d) "avg_hashrate1d", date_trunc('minute', timestamp) "timestamp"
             FROM public.worker_stats_raw 
             WHERE "user" = $1

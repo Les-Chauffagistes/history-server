@@ -2,8 +2,8 @@ from aiohttp.web_request import Request
 from aiohttp.web import json_response
 
 from core.services.stats.v1 import stats
-from .utils.parsers import parse_daily_pool_stats, parse_pool_stats, parse_worker_stats
-from .utils.serializers import serialize_worker_stats, serialyze_daily_pool_stats, serialze_pool_stats
+from .utils.parsers import parse_pool_stats, parse_worker_stats
+from .utils.serializers import serialize_worker_stats, serialze_pool_stats
 
 from init import log
 from .utils.subapp import routes
@@ -15,11 +15,6 @@ log.info("Added route Stats")
 async def get_worker_stats(request: Request):
     data = await stats.get_worker_stats(parse_worker_stats(request))
     return json_response(list(serialize_worker_stats(data)))
-
-@routes.get("/{address}")
-async def get_daily_pool_stats(request: Request):
-    data = await stats.get_daily_pool_stats(parse_daily_pool_stats(request))
-    return json_response(list(serialyze_daily_pool_stats(data)))
 
 @routes.get("/{address}/pool")
 async def get_pool_stats(request: Request):

@@ -11,7 +11,7 @@ async def get_workers_weight(payload: WorkersWeightParamsV1):
         raise ValueError("Missing parameters")
 
     stats = await POOL.get().fetch(
-        f"""
+        """
             SELECT * FROM (
                     SELECT DISTINCT ON (worker_id) 
                         worker_id, 

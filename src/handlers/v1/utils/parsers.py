@@ -16,15 +16,6 @@ def parse_worker_stats(request: Request):
     )
 
 @dataclass(frozen=True)
-class DailyPoolStatsParamsV1:
-    address: str
-
-def parse_daily_pool_stats(request: Request):
-    return DailyPoolStatsParamsV1(
-        address = request.match_info["address"],
-    )
-
-@dataclass(frozen=True)
 class PoolStatsParamsV1:
     address: str
 
