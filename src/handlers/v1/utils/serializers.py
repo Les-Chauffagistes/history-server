@@ -22,6 +22,14 @@ def serialze_pool_stats(data: Generator[dict]) -> Generator[PoolHistory]:
             "avg_hashrate1d": row["avg_hashrate1d"],
         }
 
+def serialze_pool_stats_last_n(data: Generator[dict]) -> Generator[PoolHistory]:
+    for row in data:
+        yield {
+            "timestamp": row["timestamp"] if "timestamp" in row else row["day"],
+            "avg_hashrate1h": row["avg_hashrate1h"],
+            "avg_hashrate1d": row["avg_hashrate1d"],
+        }
+
 def serialyze_worker_weights(data: Generator[dict]) -> Generator[WorkersWeight]:
     for row in data:
         yield {

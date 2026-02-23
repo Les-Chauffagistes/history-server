@@ -39,6 +39,10 @@ async def error_handler(request: Request, handler: Callable[[Request], Awaitable
             line.add_text("HTTP 404")
             return json_response({"error": "Not Found"}, status=404)
 
+        elif isinstance(e, web_exceptions.HTTPBadRequest):
+            line.add_text("HTTP 400")
+            return json_response({"error": str(e.reason)}, status=400)
+
         else:
             log.error("Unhandled exception while handling request", request.path)
             line.add_text("HTTP 500")
