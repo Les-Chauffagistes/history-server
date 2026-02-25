@@ -11,6 +11,11 @@ from .utils.subapp import routes
 log.info("Added route Stats")
 
 
+@routes.get("/pools")
+async def get_total_pool_stats(request: Request):
+    data = await stats.get_total_pool_stats()
+    return json_response(list(serialze_pool_stats_last_n(data)))
+
 @routes.get("/{address}/worker/{workername}/{period}")
 async def get_worker_stats(request: Request):
     data = await stats.get_worker_stats(parse_worker_stats(request))

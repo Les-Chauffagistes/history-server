@@ -90,6 +90,18 @@ async def get_pool_stats_last_n(payload: PoolLastNParamsV1):
     )
     return format_rows(rows)
 
+async def get_total_pool_stats():
+    stats = await POOL.get().fetch(
+        """
+            SELECT SUM(avg_hashrate1h) "avg_hashrate1h", SUM(avg_hashrate1d) "avg_hashrate1d", day
+            FROM public.worker_stats_1d
+            GROUP BY day
+            ORDER BY day ASC;
+        """.strip(),
+    )
+
+    return format_rows(stats)
+
 async def get_pool_stats(payload: PoolStatsParamsV1):
     address = payload.address
 
