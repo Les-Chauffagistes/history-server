@@ -1,7 +1,7 @@
 from aiohttp.web_request import Request
 from aiohttp.web import json_response
 
-from core.services.stats.v1 import stats
+from src.core.services.stats.v1 import stats
 from .utils.parsers import parse_pool_last_n, parse_pool_stats, parse_worker_last_n, parse_worker_stats
 from .utils.serializers import serialize_worker_stats, serialze_pool_stats, serialze_pool_stats_last_n
 

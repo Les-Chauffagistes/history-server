@@ -1,5 +1,5 @@
 from typing import Generator
-from core.models import PoolHistory, WorkerHistory, WorkersWeight
+from src.core.models import PoolHistory, WorkerHistory, WorkersWeight
 
 
 def serialize_worker_stats(data: Generator[dict]) -> Generator[WorkerHistory]:

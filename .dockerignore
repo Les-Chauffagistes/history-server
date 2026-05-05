@@ -1,0 +1,33 @@
+# Python
+venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+coverage.xml
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.claude/
+
+# Dev/test
+tests/
+
+# Logs
+*.log
+
+# Secrets
+.env
+
+# Docs / config inutiles dans l'image
+CLAUDE.md
+README.md
+sonar-project.properties
+sonar.sh
+docker-compose.yml

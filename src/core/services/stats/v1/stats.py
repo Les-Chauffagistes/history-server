@@ -1,6 +1,6 @@
-from utils.formatter import format_rows
-from handlers.v1.utils.parsers import PoolLastNParamsV1, PoolStatsParamsV1, WorkerLastNParamsV1, WorkerStatsParamsV1
-from database.postgre import POOL
+from src.utils.formatter import format_rows
+from src.handlers.v1.utils.parsers import PoolLastNParamsV1, PoolStatsParamsV1, WorkerLastNParamsV1, WorkerStatsParamsV1
+from src.database.postgre import POOL
 
 VALID_TABLES = {"forever": "worker_stats_raw", "daily": "worker_stats_1d"}
 VALID_COLUNMS_NAMES = {"forever": "timestamp", "daily": "day"}

@@ -1,7 +1,7 @@
 import asyncio
 from typing import NoReturn
-from apis.chauffagistes_pool.utils.upload import archive_stats
-from apis.chauffagistes_pool.routes import get_every_user_data
+from ..apis.chauffagistes_pool.utils.upload import archive_stats
+from ..apis.chauffagistes_pool.routes import get_every_user_data
 from asyncio import CancelledError
 
 

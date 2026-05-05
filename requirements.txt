@@ -2,5 +2,3 @@ aiohttp
 python-dotenv
 asyncpg
 aiohttp_cors
-pytest
-pytest-cov
