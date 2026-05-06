@@ -25,6 +25,9 @@ if __name__ == "__main__":
     app.add_routes(routes)
     paths = []
     log.debug("routes ", app.router.routes())
+    for route in app.router.routes():
+        log.info("added cors on", route)
+        cors.add(route)
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
