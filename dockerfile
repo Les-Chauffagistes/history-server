@@ -31,4 +31,6 @@ EXPOSE 8050
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8050}/v1/health || exit 1
 
-CMD ["python", "main.py"]
+CMD ["sh", "-c", "\
+    export DATABASE_URL=postgresql://${DB_USER}:$(cat /run/secrets/db_password)@${DB_HOST}:5432/${DB_NAME} && \
+    python main.py"]
