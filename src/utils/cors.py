@@ -24,5 +24,15 @@ cors = aiohttp_cors.setup(
             expose_headers="*",
             allow_headers="*"
         ),
+        "https://staging.chauffagistes-pool.fr": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*"
+        ),
+        "https://heatboard.staging.chauffagistes-pool.fr": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*"
+        )
     }
 )
