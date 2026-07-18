@@ -1,6 +1,6 @@
-from database.postgre import POOL
-from handlers.v1.utils.parsers import WorkersWeightParamsV1
-from utils.formatter import format_rows
+from src.database.postgre import POOL
+from src.handlers.v1.utils.parsers import WorkersWeightParamsV1
+from src.utils.formatter import format_rows
 
 
 

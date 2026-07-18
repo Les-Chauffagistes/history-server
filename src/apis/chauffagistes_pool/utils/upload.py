@@ -1,7 +1,7 @@
 from asyncpg import Pool
-from apis.chauffagistes_pool.models.User import User
-from apis.chauffagistes_pool.models.Repartition import Repartition
-from utils.converter import from_string_to_number
+from ..models.User import User
+from ..models.Repartition import Repartition
+from ....utils.converter import from_string_to_number
 from init import app, log
 from typing import List, Tuple
 

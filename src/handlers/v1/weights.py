@@ -1,7 +1,7 @@
-from handlers.v1.utils.parsers import parse_workers_weight
-from handlers.v1.utils.serializers import serialyze_worker_weights
+from src.handlers.v1.utils.parsers import parse_workers_weight
+from src.handlers.v1.utils.serializers import serialyze_worker_weights
 from .utils.subapp import routes
-from core.services.weights.v1 import weights
+from src.core.services.weights.v1 import weights
 from aiohttp.web_request import Request
 from aiohttp.web import json_response
 
