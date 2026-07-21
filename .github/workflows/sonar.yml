@@ -30,9 +30,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate Prisma client
-        run: prisma generate
-
       - name: Run tests
         run: python -m pytest
 
