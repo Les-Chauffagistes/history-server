@@ -1,4 +1,5 @@
 aiohttp
+loguru
 python-dotenv
 asyncpg
 aiohttp_cors
