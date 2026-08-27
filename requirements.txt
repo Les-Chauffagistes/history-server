@@ -1,5 +1,5 @@
 aiohttp
-loguru
+chauff-cmn
 python-dotenv
 asyncpg
 aiohttp_cors
