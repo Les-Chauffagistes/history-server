@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN --mount=type=secret,id=pipindex \
     PIP_EXTRA_INDEX_URL="$(cat /run/secrets/pipindex 2>/dev/null || true)" \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --trusted-host 10.10.0.3 -r requirements.txt
 
 
 FROM python:3.13-slim AS runtime
