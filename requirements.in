@@ -1,0 +1,7 @@
+aiohttp
+chauff-cmn
+python-dotenv
+asyncpg
+aiohttp_cors
+pytest
+pytest-cov
