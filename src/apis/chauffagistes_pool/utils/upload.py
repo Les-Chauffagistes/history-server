@@ -67,7 +67,7 @@ async def archive_stats(user_id: str, user: User, repartition: dict[str, Reparti
         log.info(f"Archivé {len(records)} records pour l'utilisateur {user_id}")
 
     except Exception as e:
-        log.error(f"Erreur lors de l'archivage pour {user_id}: {str(e)}")
+        log.exception(f"Erreur lors de l'archivage pour {user_id}: {str(e)}")
         raise
 
 
@@ -128,7 +128,7 @@ async def archive_stats_with_retry(
 
         except Exception as e:
             last_exception = e
-            log.warn(
+            log.warning(
                 f"Tentative {attempt + 1}/{max_retries} échouée pour {user_id}: {str(e)}"
             )
             if attempt < max_retries - 1:

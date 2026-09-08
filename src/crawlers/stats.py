@@ -18,15 +18,15 @@ async def gather_stats() -> NoReturn:
                     await archive_stats(user_id, pool_data, payload["repartition"])
 
                 except Exception:
-                    log.error("Error while archiving stats for user %s", user_id)
-                    
+                    log.exception(f"Error while archiving stats for user {user_id}")
+
                     continue
-        
+
         except CancelledError:
             raise
 
         except Exception:
-            log.error("Error in gather_stats loop")
+            log.exception("Error in gather_stats loop")
         
         finally:
             await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
