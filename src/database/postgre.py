@@ -24,13 +24,11 @@ async def create_db_pool(app: Application):
     # importer paresseusement le logger central pour éviter les importations circulaires
     import init as hs_init
 
-    hs_init.log.debug(os.getenv("POSTGRE_USER"))
-    hs_init.log.debug(os.getenv("POSTGRE_HOST"))
     pool = await create_pool(
-        user=os.getenv("POSTGRE_USER"),
-        password=os.getenv("POSTGRE_PASSWORD"),
-        database="chauffagistes",
-        host=os.getenv("POSTGRE_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        host=os.getenv("DB_HOST"),
         min_size=1,
         max_size=20,
         command_timeout=60,
