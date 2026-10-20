@@ -1,5 +1,5 @@
 aiohttp
-chauff-cmn>=0.3.0
+chauff-cmn>=0.4.16
 python-dotenv
 asyncpg
 aiohttp_cors
