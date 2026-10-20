@@ -27,6 +27,6 @@ async def gather_stats() -> NoReturn:
 
         except Exception:
             log.exception("Error in gather_stats loop")
-        
-        finally:
-            await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
+
+        # hors du try/finally : une annulation (SIGTERM) doit interrompre le sleep immédiatement
+        await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
