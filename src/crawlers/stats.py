@@ -2,6 +2,7 @@ import asyncio
 from typing import NoReturn
 from ..apis.chauffagistes_pool.utils.upload import archive_stats
 from ..apis.chauffagistes_pool.routes import get_every_user_data
+from chauff_cmn.callers.pools import PoolAPIClient
 from asyncio import CancelledError
 
 
@@ -10,6 +11,7 @@ async def gather_stats() -> NoReturn:
     # importer paresseusement le logger central pour éviter les importations circulaires
     import init as hs_init
     log = hs_init.log
+    client = PoolAPIClient()
     while True:
         try:
             payload = await get_every_user_data()

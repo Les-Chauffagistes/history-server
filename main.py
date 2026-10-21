@@ -3,9 +3,10 @@ import signal
 
 from src.utils.cors import cors
 import init as hs_init
-from init import GATHER_STATS, routes, PORT, app, log
+from init import routes, app, log
 from aiohttp import web
 from src.crawlers.stats import gather_stats
+from src.settings import settings
 import src.core
 
 
@@ -23,11 +24,11 @@ async def main():
     crawler: asyncio.Task | None = None
     try:
         await runner.setup()
-        if PORT:
-            site = web.TCPSite(runner, '0.0.0.0', PORT)
+        if settings.port:
+            site = web.TCPSite(runner, '0.0.0.0', settings.port)
             await site.start()
-        hs_init.log.info(f'Serveur interne en ligne sur localhost:{PORT}')
-        if GATHER_STATS:
+        hs_init.log.info(f'Serveur interne en ligne sur localhost:{settings.port}')
+        if settings.gather_stats:
             crawler = asyncio.create_task(gather_stats(), name="gather_stats")
         await stop.wait()
         hs_init.log.info("Signal d'arrêt reçu, arrêt en cours...")

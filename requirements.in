@@ -1,7 +1,8 @@
 aiohttp
-chauff-cmn>=0.4.16
+chauff-cmn>=0.4.18
 python-dotenv
 asyncpg
 aiohttp_cors
 pytest
 pytest-cov
+pydantic_settings

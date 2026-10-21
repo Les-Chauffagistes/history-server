@@ -15,6 +15,3 @@ app = web.Application(middlewares=(error_handler,))
 app.on_startup.append(create_db_pool)
 app.on_cleanup.append(close_db_pool)
 routes = web.RouteTableDef()
-
-GATHER_STATS = getenv("GATHER_STATS", "true").lower() == "true"
-PORT = cast(int, getenv("PORT"))
