@@ -14,9 +14,9 @@ async def gather_stats(client: PoolAPIClient) -> NoReturn:
     while True:
         try:
             payload = await client.get_cluster()
-            for user_id, pool_data in payload["users"].items():
+            for user_id, pool_data in payload.users.items():
                 try:
-                    await archive_stats(user_id, pool_data, payload["repartition"])
+                    await archive_stats(user_id, pool_data, payload.repartition)
 
                 except Exception:
                     log.exception(f"Error while archiving stats for user {user_id}")

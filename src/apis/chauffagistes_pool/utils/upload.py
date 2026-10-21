@@ -1,39 +1,42 @@
 from asyncpg import Pool
-from ..models.User import User
-from ..models.Repartition import Repartition
 from ....utils.converter import from_string_to_number
 from init import app, log
 from typing import List, Tuple
+from chauff_cmn.models import PoolUser, Repartition
 
 
+def _percentage(repartition: dict[str, Repartition], workername: str) -> float:
+    entry = repartition.get(workername)
+    return entry.percentage if entry else 0.0
 
-async def archive_stats(user_id: str, user: User, repartition: dict[str, Repartition]):
+
+async def archive_stats(user_id: str, user: PoolUser, repartition: dict[str, Repartition]):
     """Archive les statistiques des workers dans la base de données."""
     pool: Pool = app["db_pool"]
 
     # Préparer les données
     records: List[Tuple[str, float, float, float, float, float, float, str]] = []
 
-    for worker in user.get("worker", []):
+    for worker in user.worker:
         # Extraction du nom du worker
-        worker_name_parts = worker["workername"].split(".")
+        worker_name_parts = worker.workername.split(".")
         worker_name = (
             worker_name_parts[1] if len(worker_name_parts) > 1 else "worker sans nom"
         )
 
         # Récupération du pourcentage de répartition
-        worker_repartition = repartition.get(worker["workername"], {})
-        percentage = float(worker_repartition.get("percentage", 0.0))
+        worker_repartition = repartition.get(worker.workername)
+        percentage = worker_repartition.percentage if worker_repartition else 0.0
 
         # Construction du tuple
         records.append(
             (
                 worker_name,
-                from_string_to_number(worker.get("hashrate1m", "0")),
-                from_string_to_number(worker.get("hashrate5m", "0")),
-                from_string_to_number(worker.get("hashrate1hr", "0")),
-                from_string_to_number(worker.get("hashrate1d", "0")),
-                from_string_to_number(worker.get("hashrate7d", "0")),
+                from_string_to_number(worker.hashrate1m),
+                from_string_to_number(worker.hashrate5m),
+                from_string_to_number(worker.hashrate1hr),
+                from_string_to_number(worker.hashrate1d),
+                from_string_to_number(worker.hashrate7d),
                 percentage,
                 user_id,
             )
@@ -73,7 +76,7 @@ async def archive_stats(user_id: str, user: User, repartition: dict[str, Reparti
 
 # Version alternative avec gestion d'erreurs améliorée
 async def archive_stats_with_retry(
-    user_id: str, user: User, repartition: dict[str, Repartition], max_retries: int = 3
+    user_id: str, user: PoolUser, repartition: dict[str, Repartition], max_retries: int = 3
 ):
     """Archive avec mécanisme de retry."""
     pool: Pool = app["db_pool"]
@@ -81,8 +84,8 @@ async def archive_stats_with_retry(
     # Préparer les données (même logique)
     records: List[Tuple[str, float, float, float, float, float, float, str]] = []
 
-    for worker in user.get("worker", []):
-        worker_name_parts = worker["workername"].split(".")
+    for worker in user.worker:
+        worker_name_parts = worker.workername.split(".")
         worker_name = (
             worker_name_parts[1] if len(worker_name_parts) > 1 else "worker sans nom"
         )
@@ -90,12 +93,12 @@ async def archive_stats_with_retry(
         records.append(
             (
                 worker_name,
-                from_string_to_number(worker.get("hashrate1m", "0")),
-                from_string_to_number(worker.get("hashrate5m", "0")),
-                from_string_to_number(worker.get("hashrate1hr", "0")),
-                from_string_to_number(worker.get("hashrate1d", "0")),
-                from_string_to_number(worker.get("hashrate7d", "0")),
-                float(repartition.get(worker["workername"], {}).get("percentage", 0.0)),
+                from_string_to_number(worker.hashrate1m),
+                from_string_to_number(worker.hashrate5m),
+                from_string_to_number(worker.hashrate1hr),
+                from_string_to_number(worker.hashrate1d),
+                from_string_to_number(worker.hashrate7d),
+                _percentage(repartition, worker.workername),
                 user_id,
             )
         )
@@ -144,15 +147,15 @@ async def archive_stats_with_retry(
 
 # Version batch pour plusieurs utilisateurs
 async def archive_stats_batch(
-    users_data: List[Tuple[str, User, dict[str, Repartition]]],
+    users_data: List[Tuple[str, PoolUser, dict[str, Repartition]]],
 ):
     """Archive les statistiques de plusieurs utilisateurs en une transaction."""
     pool: Pool = app["db_pool"]
     all_records: List[Tuple[str, float, float, float, float, float, float, str]] = []
 
     for user_id, user, repartition in users_data:
-        for worker in user.get("worker", []):
-            worker_name_parts = worker["workername"].split(".")
+        for worker in user.worker:
+            worker_name_parts = worker.workername.split(".")
             worker_name = (
                 worker_name_parts[1]
                 if len(worker_name_parts) > 1
@@ -162,14 +165,12 @@ async def archive_stats_batch(
             all_records.append(
                 (
                     worker_name,
-                    from_string_to_number(worker.get("hashrate1m", "0")),
-                    from_string_to_number(worker.get("hashrate5m", "0")),
-                    from_string_to_number(worker.get("hashrate1hr", "0")),
-                    from_string_to_number(worker.get("hashrate1d", "0")),
-                    from_string_to_number(worker.get("hashrate7d", "0")),
-                    float(
-                        repartition.get(worker["workername"], {}).get("percentage", 0.0)
-                    ),
+                    from_string_to_number(worker.hashrate1m),
+                    from_string_to_number(worker.hashrate5m),
+                    from_string_to_number(worker.hashrate1hr),
+                    from_string_to_number(worker.hashrate1d),
+                    from_string_to_number(worker.hashrate7d),
+                    _percentage(repartition, worker.workername),
                     user_id,
                 )
             )
@@ -201,12 +202,12 @@ async def archive_stats_batch(
 
 # Version avec insertion batch alternative (INSERT multiple)
 async def archive_stats_batch_insert(
-    user_id: str, user: User, repartition: dict[str, Repartition]
+    user_id: str, user: PoolUser, repartition: dict[str, Repartition]
 ):
     """Alternative utilisant INSERT multiple au lieu de copy_records_to_table."""
     pool: Pool = app["db_pool"]
 
-    if not user.get("worker"):
+    if not user.worker:
         return
 
     # Construire la requête INSERT batch
@@ -214,8 +215,8 @@ async def archive_stats_batch_insert(
     params = []
     param_counter = 1
 
-    for worker in user["worker"]:
-        worker_name_parts = worker["workername"].split(".")
+    for worker in user.worker:
+        worker_name_parts = worker.workername.split(".")
         worker_name = (
             worker_name_parts[1] if len(worker_name_parts) > 1 else "worker sans nom"
         )
@@ -229,12 +230,12 @@ async def archive_stats_batch_insert(
         params.extend(
             [
                 worker_name,
-                from_string_to_number(worker.get("hashrate1m", "0")),
-                from_string_to_number(worker.get("hashrate5m", "0")),
-                from_string_to_number(worker.get("hashrate1hr", "0")),
-                from_string_to_number(worker.get("hashrate1d", "0")),
-                from_string_to_number(worker.get("hashrate7d", "0")),
-                float(repartition.get(worker["workername"], {}).get("percentage", 0.0)),
+                from_string_to_number(worker.hashrate1m),
+                from_string_to_number(worker.hashrate5m),
+                from_string_to_number(worker.hashrate1hr),
+                from_string_to_number(worker.hashrate1d),
+                from_string_to_number(worker.hashrate7d),
+                _percentage(repartition, worker.workername),
                 user_id,
             ]
         )
