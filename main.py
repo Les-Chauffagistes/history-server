@@ -34,6 +34,7 @@ async def main():
 
     runner = web.AppRunner(app, shutdown_timeout=SHUTDOWN_TIMEOUT)
     crawler: asyncio.Task | None = None
+    client: PoolAPIClient | None = None
     try:
         await runner.setup()
         if settings.port:
@@ -54,6 +55,8 @@ async def main():
         if crawler:
             crawler.cancel()
             await asyncio.gather(crawler, return_exceptions=True)
+        if client:
+            await client.close()
         # arrête le listener, attend les requêtes en cours puis exécute on_cleanup (fermeture du pool DB)
         await runner.cleanup()
         hs_init.log.info("Bye")
