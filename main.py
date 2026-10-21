@@ -5,12 +5,24 @@ from src.utils.cors import cors
 import init as hs_init
 from init import routes, app, log
 from aiohttp import web
+from chauff_cmn.callers.pools import PoolAPIClient
 from src.crawlers.stats import gather_stats
 from src.settings import settings
 import src.core
 
 
 SHUTDOWN_TIMEOUT = 20
+
+
+def _watch_crawler(stop: asyncio.Event):
+    def on_done(task: asyncio.Task) -> None:
+        if task.cancelled():
+            return
+        exc = task.exception()
+        # le crawler est censé tourner indéfiniment : toute fin est anormale, on arrête le process
+        log.error("gather_stats s'est arrêté de façon inattendue", exc_info=exc)
+        stop.set()
+    return on_done
 
 
 async def main():
@@ -30,7 +42,10 @@ async def main():
         hs_init.log.info(f'Serveur interne en ligne sur localhost:{settings.port}')
         if settings.gather_stats:
             log.info("Stats will be collected")
-            crawler = asyncio.create_task(gather_stats(), name="gather_stats")
+            # construit hors de la tâche : une erreur de config fait échouer le démarrage
+            client = PoolAPIClient(api_url=settings.stats_url, api_key=settings.stats_api_token)
+            crawler = asyncio.create_task(gather_stats(client), name="gather_stats")
+            crawler.add_done_callback(_watch_crawler(stop))
         else:
             log.info("Stats will not be collected")
         await stop.wait()
