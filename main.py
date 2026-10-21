@@ -29,7 +29,10 @@ async def main():
             await site.start()
         hs_init.log.info(f'Serveur interne en ligne sur localhost:{settings.port}')
         if settings.gather_stats:
+            log.info("Stats will be collected")
             crawler = asyncio.create_task(gather_stats(), name="gather_stats")
+        else:
+            log.info("Stats will not be collected")
         await stop.wait()
         hs_init.log.info("Signal d'arrêt reçu, arrêt en cours...")
     finally:
