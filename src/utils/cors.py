@@ -4,33 +4,8 @@ from init import app
 cors = aiohttp_cors.setup(
     app,
     defaults={
-        "https://stats.chauffagistes-pool.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*"
-        ),
-        "https://heatboard.chauffagistes-btc.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*"
-        ),
-        "https://chauffagistes.swakraft.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*"
-        ),
-        "https://heatboard.swakraft.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*"
-        ),
-        "https://staging.chauffagistes-btc.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*"
-        ),
-        "https://heatboard.staging.chauffagistes-btc.fr": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=False,
             expose_headers="*",
             allow_headers="*"
         )

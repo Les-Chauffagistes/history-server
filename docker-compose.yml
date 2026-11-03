@@ -1,13 +1,21 @@
 services:
   app:
-    image: history-server:v1
+    build:
+      context: .
+      secrets:
+        - pipindex
     restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
     env_file: .env
     ports:
       - "${PORT:-8050}:8050"
     environment:
       PORT: "8050"
-      POSTGRE_HOST: timescaledb
+      DB_HOST: timescaledb
+      DB_NAME: chauffagistes
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       timescaledb:
         condition: service_healthy
@@ -22,19 +30,23 @@ services:
     image: timescale/timescaledb-ha:pg17
     restart: unless-stopped
     ports:
-      - "${POSTGRE_PORT:-5432}:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${POSTGRE_USER}
-      POSTGRES_PASSWORD: ${POSTGRE_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: chauffagistes
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRE_USER} -d chauffagistes"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d chauffagistes"]
       interval: 10s
       timeout: 5s
       start_period: 30s
       retries: 5
+
+secrets:
+  pipindex:
+    environment: PIP_EXTRA_INDEX_URL
 
 volumes:
   pgdata:
