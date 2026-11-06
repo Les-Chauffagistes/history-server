@@ -24,7 +24,7 @@ async def error_handler(request: Request, handler: Callable[[Request], Awaitable
 
         elif isinstance(e, web_exceptions.HTTPNotFound):
             status = 404
-            return json_response({"error": "Not Found"}, status=404)
+            return json_response({"error": str(e.reason)}, status=404)
 
         elif isinstance(e, web_exceptions.HTTPBadRequest):
             status = 400

@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     port: int
     stats_api_token: str
     stats_url: str
+    database_url: str
 
     model_config = {"env_file": ".env", "extra": "allow"}
 

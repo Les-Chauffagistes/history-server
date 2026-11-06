@@ -1,3 +1,5 @@
+import re
+from datetime import datetime, timezone
 from typing import Literal
 from aiohttp import web
 from aiohttp.web_request import Request
@@ -83,3 +85,30 @@ def parse_pool_last_n(request: Request) -> PoolLastNParamsV1:
         source=source,
         n=n,
     )
+
+@dataclass(frozen=True)
+class PoolDistributionParamsV1:
+    address: str
+    at: datetime  # toujours timezone-aware, en UTC
+
+
+def parse_iso_datetime(value: str | None) -> datetime:
+    """Parse une date ISO 8601 avec fuseau obligatoire (ex. 2026-11-04T17:09:23Z ou ...+01:00)."""
+    if not value:
+        raise web.HTTPBadRequest(reason="at query param is required (ISO 8601 date)")
+    # Un '+' non encodé dans une query string devient un espace : "…23+01:00" arrive en "…23 01:00".
+    value = re.sub(r" (\d{2}:\d{2})$", r"+\1", value.strip())
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        raise web.HTTPBadRequest(reason="at must be a valid ISO 8601 date")
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise web.HTTPBadRequest(reason="at must include a timezone (e.g. 'Z' or '+00:00')")
+    return parsed.astimezone(timezone.utc)
+
+
+def parse_pool_distribution(request: Request) -> PoolDistributionParamsV1:
+    at = parse_iso_datetime(request.query.get("at"))
+    if at > datetime.now(timezone.utc):
+        raise web.HTTPBadRequest(reason="at must not be in the future")
+    return PoolDistributionParamsV1(address=request.match_info["address"], at=at)

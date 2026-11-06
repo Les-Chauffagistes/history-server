@@ -1,6 +1,7 @@
-import json, os
-from asyncpg import Connection, Pool, create_pool
+import json
 from aiohttp.web import Application
+from asyncpg import Connection, Pool, create_pool
+from src.settings import settings
 
 
 class PoolProvider:
@@ -22,13 +23,9 @@ POOL = PoolProvider(None)
 async def create_db_pool(app: Application):
     """Créer le pool de connexions au démarrage"""
     # importer paresseusement le logger central pour éviter les importations circulaires
-    import init as hs_init
 
     pool = await create_pool(
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME"),
-        host=os.getenv("DB_HOST"),
+        settings.database_url,
         min_size=1,
         max_size=20,
         command_timeout=60,

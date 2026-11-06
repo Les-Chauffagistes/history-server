@@ -1,9 +1,10 @@
 from aiohttp.web_request import Request
-from aiohttp.web import json_response
+from aiohttp.web import json_response, HTTPNotFound
 
 from src.core.services.stats.v1 import stats
-from .utils.parsers import parse_pool_last_n, parse_pool_stats, parse_worker_last_n, parse_worker_stats
-from .utils.serializers import serialize_worker_stats, serialze_pool_stats, serialze_pool_stats_last_n
+from .utils.parsers import parse_pool_last_n, parse_pool_stats, parse_worker_last_n, parse_worker_stats, \
+    parse_pool_distribution
+from .utils.serializers import serialize_worker_stats, serialize_pool_stats, serialize_pool_stats_last_n, serialize_distribution_at
 
 from init import log
 from .utils.subapp import routes
@@ -14,7 +15,7 @@ log.info("Added route Stats")
 @routes.get("/pools")
 async def get_total_pool_stats(request: Request):
     data = await stats.get_total_pool_stats()
-    return json_response(list(serialze_pool_stats_last_n(data)))
+    return json_response(list(serialize_pool_stats_last_n(data)))
 
 @routes.get("/{address}/worker/{workername}/{period}")
 async def get_worker_stats(request: Request):
@@ -24,7 +25,7 @@ async def get_worker_stats(request: Request):
 @routes.get("/{address}/pool")
 async def get_pool_stats(request: Request):
     data = await stats.get_pool_stats(parse_pool_stats(request))
-    return json_response(list(serialze_pool_stats(data)))
+    return json_response(list(serialize_pool_stats(data)))
 
 @routes.get("/{address}/worker/{workername}/{source}/last/{n}")
 async def get_worker_stats_last_n(request: Request):
@@ -34,4 +35,12 @@ async def get_worker_stats_last_n(request: Request):
 @routes.get("/{address}/pool/{source}/last/{n}")
 async def get_pool_stats_last_n(request: Request):
     data = await stats.get_pool_stats_last_n(parse_pool_last_n(request))
-    return json_response(list(serialze_pool_stats_last_n(data)))
+    return json_response(list(serialize_pool_stats_last_n(data)))
+
+@routes.get("/{address}/distribution")
+async def get_pool_distribution(request: Request):
+    try:
+        data = await stats.get_distribution_at(parse_pool_distribution(request))
+    except stats.DistributionNotFound as e:
+        raise HTTPNotFound(reason=str(e))
+    return json_response(list(serialize_distribution_at(data)))

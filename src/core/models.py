@@ -20,3 +20,9 @@ class WorkersWeight(TypedDict):
     timestamp: datetime
     worker_id: str
     avg_weight: float
+
+
+class PoolDistributionAt(TypedDict):
+    workername: str
+    part: float  # fraction 0-1
+    sampled_at: str  # ISO 8601

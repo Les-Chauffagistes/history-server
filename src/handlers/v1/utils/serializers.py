@@ -1,5 +1,5 @@
 from typing import Generator
-from src.core.models import PoolHistory, WorkerHistory, WorkersWeight
+from src.core.models import PoolDistributionAt, PoolHistory, WorkerHistory, WorkersWeight
 
 
 def serialize_worker_stats(data: Generator[dict]) -> Generator[WorkerHistory]:
@@ -14,7 +14,8 @@ def serialize_worker_stats(data: Generator[dict]) -> Generator[WorkerHistory]:
             "avg_weight": row["avg_weight"],
         }
 
-def serialze_pool_stats(data: Generator[dict]) -> Generator[PoolHistory]:
+
+def serialize_pool_stats(data: Generator[dict]) -> Generator[PoolHistory]:
     for row in data:
         yield {
             "timestamp": row["timestamp"],
@@ -22,7 +23,8 @@ def serialze_pool_stats(data: Generator[dict]) -> Generator[PoolHistory]:
             "avg_hashrate1d": row["avg_hashrate1d"],
         }
 
-def serialze_pool_stats_last_n(data: Generator[dict]) -> Generator[PoolHistory]:
+
+def serialize_pool_stats_last_n(data: Generator[dict]) -> Generator[PoolHistory]:
     for row in data:
         yield {
             "timestamp": row["timestamp"] if "timestamp" in row else row["day"],
@@ -30,10 +32,20 @@ def serialze_pool_stats_last_n(data: Generator[dict]) -> Generator[PoolHistory]:
             "avg_hashrate1d": row["avg_hashrate1d"],
         }
 
-def serialyze_worker_weights(data: Generator[dict]) -> Generator[WorkersWeight]:
+
+def serialize_worker_weights(data: Generator[dict]) -> Generator[WorkersWeight]:
     for row in data:
         yield {
             "timestamp": row["timestamp"],
             "worker_id": row["worker_id"],
             "avg_weight": row["avg_weight"],
+        }
+
+
+def serialize_distribution_at(data: list[dict]) -> Generator[PoolDistributionAt]:
+    for row in data:
+        yield {
+            "workername": row["workername"],
+            "part": row["part"],
+            "sampled_at": row["sampled_at"].isoformat(timespec="seconds"),
         }

@@ -91,6 +91,40 @@ Mêmes paramètres et mêmes règles de validation que l'endpoint worker ci-dess
 
 ---
 
+### `GET /{address}/distribution?at=<date ISO 8601>`
+
+Répartition du travail entre les workers d'une adresse à une date donnée (utilisée pour le paiement des récompenses de block).
+
+| Paramètre | Description |
+|---|---|
+| `address` | adresse BTC (identifiant du pool/utilisateur) |
+| `at` | date ISO 8601 **avec fuseau obligatoire** (`2026-11-04T17:09:23Z`, `...+01:00`). Un `+` doit être encodé (`%2B`) ; un offset reçu sous la forme ` 01:00` est toléré. Normalisée en UTC. |
+
+**Source** : `worker_stats_raw.avg_weight` (pourcentage de chaque worker calculé par pool-api sur sa fenêtre glissante `distribution_window_days`, échantillonné toutes les 30 min par le crawler). Aucune interpolation : on prend le dernier échantillon dont le timestamp est `<= at` (toutes les lignes de l'adresse dans les 60 s précédant ce timestamp, une par worker). Les poids sont renormalisés par leur somme : `part` est une **fraction 0-1** et **la somme des parts vaut 1** (aux erreurs flottantes près). Le résultat est déterministe pour un `at` donné (tri par `part` décroissant puis `workername`).
+
+L'échantillon est refusé s'il est plus vieux que 2 h par rapport à `at` (4 passes du crawler manquées).
+
+**Réponse 200 :**
+```json
+[
+  {"workername": "asic1", "part": 0.75, "sampled_at": "2026-11-04T16:59:23+00:00"},
+  {"workername": "asic2", "part": 0.25, "sampled_at": "2026-11-04T16:59:23+00:00"}
+]
+```
+
+`diff_sum`, `shares_ok` et `shares_ko` (cf. `PoolDistributionElement` de chauff-cmn) ne sont **pas** disponibles : history-server ne stocke que le poids relatif, pas les shares.
+
+**Erreurs :**
+
+| Code | Raison |
+|---|---|
+| 400 | `at` absent, non ISO 8601, sans fuseau (ex. timestamp unix) ou dans le futur |
+| 404 | aucun échantillon `<= at` (adresse inconnue, `at` antérieur à la rétention de `worker_stats_raw`, ou trou de collecte > 2 h), ou poids total nul |
+
+Les données compressées par TimescaleDB restent lisibles ; seule la rétention (purge) rend une date inaccessible.
+
+---
+
 ## Exemples
 
 ```bash
@@ -102,6 +136,9 @@ GET /v1/{address}/worker/{workername}/daily/last/180
 
 # 30 derniers jours pool-level (brut)
 GET /v1/{address}/pool/forever/last/30
+
+# Répartition à la date de minage du block
+GET /v1/{address}/distribution?at=2026-11-04T17:09:23Z
 
 # Erreurs 400 attendues
 GET /v1/{address}/worker/{workername}/forever/last/120  # n > 90
